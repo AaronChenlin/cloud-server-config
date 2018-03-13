@@ -26,7 +26,7 @@ spring:
       bindings:
         sleuth:
           destination: sleuth-jyl
-name: 小明
+name: 陈林
 
 management:
   security:

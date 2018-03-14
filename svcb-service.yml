@@ -38,7 +38,7 @@ spring:
     password: 123456
 
 
-msg: 调用B服务成功111
+msg: 调用B服务成功11111
 
 management:
   security:

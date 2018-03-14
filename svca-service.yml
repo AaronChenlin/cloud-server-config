@@ -1,8 +1,8 @@
 server:
-  port: 9001
+  port: 9002
 spring:
   application:
-    name: svca-service
+    name: svcb-service
   cloud: 
     bus: 
       trace:
@@ -10,13 +10,6 @@ spring:
         enabled: true
   profiles:
     active: dev
-  sleuth:
-    integration:
-      enabled: false
-    scheduled:
-      skip-pattern: "^org.*HystrixStreamTask$"
-    sampler:
-      percentage: 1
   rabbitmq:
     host: localhost
     port: 5672
@@ -24,14 +17,28 @@ spring:
     password: guest
     listener:
       simple:
-        concurrency: 2
-        max-concurrency: 2
+        concurrency: 10
+        max-concurrency: 20
+  sleuth:
+    integration:
+      enabled: false
+    scheduled:
+      skip-pattern: "^org.*HystrixStreamTask$"
+    sampler:
+      percentage: 1
   cloud:
     stream:
       bindings:
         sleuth:
           destination: sleuth-jyl
-name: 陈林Aaaa
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?statementInterceptors=brave.mysql.TracingStatementInterceptor
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+
+
+msg: 调用B服务成功
 
 management:
   security:
@@ -42,46 +49,18 @@ management:
 feign:
   hystrix:
     enabled: true
+
 hystrix:
   command:
     default:
-      fallback: 
-        isolation: 
-          semaphore: 
-            maxConcurrentRequests: 3
       execution:
-        timeout: 
-          enabled: true
         isolation:
-          strategy: THREAD 
           thread:
-            timeoutInMilliseconds: 3000
-            #设置HystrixCommand.run()的执行是否在超时发生时被中断
-            interruptOnTimeout: true
-  threadpool: 
-    default: 
-      #线程池核心线程数
-      coreSize: 10
-      #设置线程池最大值
-      maximumSize: 20
-      #设置BlockingQueue最大的队列值
-      maxQueueSize: 10
-      #设置队列拒绝的阈值
-      queueSizeRejectionThreshold: 5
-      #设置滚动的统计窗口被分成的桶（bucket）的数目
-      metrics: 
-        rollingStats: 
-          numBuckets: 10
+            timeoutInMilliseconds: 5000
   stream:
     queue:
       destination: hystrix-jyl
-#对某一个服务单独配置
-svcb-service: 
-  ribbon:
-    ReadTimeout: 3000
-    ConnectTimeout: 2000
-    MaxAutoRetriesNextServer: 3
-#    OkToRetryOnAllOperations: true
+
 eureka:
   instance:
     instance-id: ${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${server.port}}:${random.int[0,999]}
@@ -90,13 +69,10 @@ eureka:
     hostname: localhost
     prefer-ip-address: true
     metadata-map:
-      user.name: ${security.user.name}
-      user.password: ${security.user.password}
+      lancher: 1
 #      management.context-path: ${server.context-path}${management.context-path}
   client:
-    service-url:
+    healthcheck:
+      enabled: true
+    service-url: 
       defaultZone: http://user:${REGISTRY_SERVER_PASSWORD:password}@${SPRING_CLOUD_EUREKA_URI:127.0.0.1:8761}/eureka/,http://user:${REGISTRY_SERVER_PASSWORD:password}@${SPRING_CLOUD_EUREKA_URI:127.0.0.1:8762}/eureka/
-#svcb-service:
-#  ribbon:
-##    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
-

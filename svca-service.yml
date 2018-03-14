@@ -3,6 +3,11 @@ server:
 spring:
   application:
     name: svca-service
+  cloud: 
+    bus: 
+      trace:
+        #启用总线事件跟踪
+        enabled: true
   profiles:
     active: dev
   sleuth:
@@ -26,7 +31,7 @@ spring:
       bindings:
         sleuth:
           destination: sleuth-jyl
-name: 陈林
+name: 陈林Aaaa
 
 management:
   security:

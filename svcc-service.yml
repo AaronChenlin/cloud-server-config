@@ -3,6 +3,11 @@ server:
 spring:
   application:
     name: svcc-service
+  cloud: 
+    bus: 
+      trace:
+        #启用总线事件跟踪
+        enabled: true
   profiles:
     active: dev
   rabbitmq:

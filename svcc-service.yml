@@ -1,15 +1,15 @@
 server:
-  port: 0
+  port: 9003
 spring:
   application:
     name: svcc-service
   profiles:
     active: dev
   rabbitmq:
-    host: 11.11.136.121
-    port: 32086
-    username: user
-    password: password
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
     listener:
       simple:
         concurrency: 2
@@ -19,6 +19,13 @@ spring:
       enabled: false
     scheduled:
       skip-pattern: "^org.*HystrixStreamTask$"
+    sampler:
+      percentage: 1
+  cloud:
+    stream:
+      bindings:
+        sleuth:
+          destination: sleuth-jyl
 
 name: 李四
 
@@ -30,32 +37,30 @@ management:
         enabled: false
 feign:
   hystrix:
-    enabled: false
+    enabled: true
 
 ribbon:
-  ReadTimeout: 0
+  ReadTimeout: 3000
 
 hystrix:
-  command:
-    default:
+  command: 
+    default: 
       execution:
         isolation:
           thread:
-            timeoutInMilliseconds: 15000
+            timeoutInMilliseconds: 5000
+  stream:
+    queue:
+      destination: hystrix-jyl
 
 eureka:
   instance:
-    hostname: 127.0.0.1
+    instance-id: ${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${server.port}}:${random.int[0,999]}
+    hostname: localhost
     prefer-ip-address: true
     metadata-map:
-      user.name: ${security.user.name}
-      user.password: ${security.user.password}
+      lancher: 0
   client:
     service-url:
-      defaultZone: http://user:${REGISTRY_SERVER_PASSWORD:password}@${SPRING_CLOUD_EUREKA_URI:127.0.0.1:8761}/eureka/
----
-spring:
-  profiles: ocp
-server:
-  port: 8080
+      defaultZone: http://user:${REGISTRY_SERVER_PASSWORD:password}@${SPRING_CLOUD_EUREKA_URI:127.0.0.1:8761}/eureka/,http://user:${REGISTRY_SERVER_PASSWORD:password}@${SPRING_CLOUD_EUREKA_URI:127.0.0.1:8762}/eureka/
 

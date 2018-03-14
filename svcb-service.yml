@@ -1,15 +1,15 @@
 server:
-  port: 0
+  port: 9002
 spring:
   application:
     name: svcb-service
   profiles:
     active: dev
   rabbitmq:
-    host: 11.11.136.121
-    port: 32086
-    username: user
-    password: password
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
     listener:
       simple:
         concurrency: 2
@@ -19,6 +19,19 @@ spring:
       enabled: false
     scheduled:
       skip-pattern: "^org.*HystrixStreamTask$"
+    sampler:
+      percentage: 1
+  cloud:
+    stream:
+      bindings:
+        sleuth:
+          destination: sleuth-jyl
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?statementInterceptors=brave.mysql.TracingStatementInterceptor
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+
 
 msg: 调用B服务成功
 
@@ -28,30 +41,33 @@ management:
   health:
       rabbit:
         enabled: false
-
 feign:
   hystrix:
-    enabled: false
+    enabled: true
 
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+  stream:
+    queue:
+      destination: hystrix-jyl
 
 eureka:
   instance:
     instance-id: ${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${server.port}}:${random.int[0,999]}
 #    health-check-url-path: ${server.context-path}${management.context-path}/health
 #    status-page-url-path: ${server.context-path}${management.context-path}/info
-    hostname: 127.0.0.1
+    hostname: localhost
     prefer-ip-address: true
     metadata-map:
-      user.name: ${security.user.name}
-      user.password: ${security.user.password}
+      lancher: 1
 #      management.context-path: ${server.context-path}${management.context-path}
   client:
-    service-url:
-      defaultZone: http://user:${REGISTRY_SERVER_PASSWORD:password}@${SPRING_CLOUD_EUREKA_URI:127.0.0.1:8761}/eureka/
----
-spring:
-  profiles: ocp
-server:
-  port: 8080
-
-
+    healthcheck:
+      enabled: true
+    service-url: 
+      defaultZone: http://user:${REGISTRY_SERVER_PASSWORD:password}@${SPRING_CLOUD_EUREKA_URI:127.0.0.1:8761}/eureka/,http://user:${REGISTRY_SERVER_PASSWORD:password}@${SPRING_CLOUD_EUREKA_URI:127.0.0.1:8762}/eureka/

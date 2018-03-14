@@ -30,7 +30,7 @@ spring:
       bindings:
         sleuth:
           destination: sleuth-jyl
-#name: 陈林A
+name: 陈林A
 management:
   security:
     enabled: false

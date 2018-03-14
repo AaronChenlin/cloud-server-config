@@ -1,0 +1,77 @@
+server:
+  port: 9002
+spring:
+  application:
+    name: svcb-service
+  cloud: 
+    bus: 
+      trace:
+        #启用总线事件跟踪
+        enabled: true
+  profiles:
+    active: dev
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        concurrency: 10
+        max-concurrency: 20
+  sleuth:
+    integration:
+      enabled: false
+    scheduled:
+      skip-pattern: "^org.*HystrixStreamTask$"
+    sampler:
+      percentage: 1
+    stream:
+      bindings:
+        sleuth:
+          destination: sleuth-jyl
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?statementInterceptors=brave.mysql.TracingStatementInterceptor
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: 123456
+
+
+msg: 调用B服务成功
+
+management:
+  security:
+    enabled: false
+  health:
+      rabbit:
+        enabled: false
+feign:
+  hystrix:
+    enabled: true
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+  stream:
+    queue:
+      destination: hystrix-jyl
+
+eureka:
+  instance:
+    instance-id: ${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${server.port}}:${random.int[0,999]}
+#    health-check-url-path: ${server.context-path}${management.context-path}/health
+#    status-page-url-path: ${server.context-path}${management.context-path}/info
+    hostname: localhost
+    prefer-ip-address: true
+    metadata-map:
+      lancher: 1
+#      management.context-path: ${server.context-path}${management.context-path}
+  client:
+    healthcheck:
+      enabled: true
+    service-url: 
+      defaultZone: http://user:${REGISTRY_SERVER_PASSWORD:password}@${SPRING_CLOUD_EUREKA_URI:127.0.0.1:8761}/eureka/,http://user:${REGISTRY_SERVER_PASSWORD:password}@${SPRING_CLOUD_EUREKA_URI:127.0.0.1:8762}/eureka/

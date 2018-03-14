@@ -26,7 +26,6 @@ spring:
       simple:
         concurrency: 2
         max-concurrency: 2
-  cloud:
     stream:
       bindings:
         sleuth:

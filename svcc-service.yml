@@ -4,6 +4,8 @@ spring:
   application:
     name: svcc-service
   cloud: 
+    client: 
+      hostname: peer3
     bus: 
       trace:
         #启用总线事件跟踪

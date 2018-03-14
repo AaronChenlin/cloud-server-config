@@ -31,7 +31,7 @@ spring:
         sleuth:
           destination: sleuth-jyl
 
-name: 李四aaa
+name: 李四
 
 management:
   security:
@@ -60,7 +60,7 @@ hystrix:
 eureka:
   instance:
     instance-id: ${spring.cloud.client.hostname}:${spring.application.name}:${spring.application.instance_id:${server.port}}:${random.int[0,999]}
-    hostname: localhost
+    hostname: peer3
     prefer-ip-address: true
     metadata-map:
       lancher: 0

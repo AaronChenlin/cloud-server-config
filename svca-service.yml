@@ -26,7 +26,7 @@ spring:
       bindings:
         sleuth:
           destination: sleuth-jyl
-name: 陈林
+name: 陈林aaaaa
 
 management:
   security:
